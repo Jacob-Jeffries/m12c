@@ -16,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/Jacob-Jeffries/m12c/issues"
   },
-  "homepage": "https://github.com/Jacob-Jeffries/m12c#readme"
+  "homepage": "https://github.com/Jacob-Jeffries/m12c#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^16.0.3",
+    "inquirer": "^9.1.4",
+    "mysql2": "^3.2.0"
+  }
 }

@@ -2,6 +2,7 @@ const mysql = require('mysql2/promise');
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const { ConnectableObservable } = require('rxjs');
+const { clear } = require('console');
 require('dotenv').config();
 
 async function connect() {  
@@ -24,6 +25,7 @@ async function viewDepartments() {
   console.log('\n');
   console.table(rows); 
   console.log('\n');  
+  main();
 };
 
 async function viewRoles() {
@@ -33,6 +35,7 @@ async function viewRoles() {
   console.log('\n');
   console.table(rows); 
   console.log('\n');
+  main();
 };
 
 async function viewEmployees() {
@@ -42,11 +45,11 @@ async function viewEmployees() {
   console.log('\n');
   console.table(rows); 
   console.log('\n');
-  db.end();
-  mainMenu();
+  main();
 };
 
 function mainMenu(){
+  console.log('\n');
   const query = [
     {
       name: "mMenu",
@@ -68,22 +71,32 @@ function mainMenu(){
   return inquirer.prompt(query);
 };
 
-function quit() {
-  process.exit(0);
-}
-
-async function main(){
+function display(){
+  clear();
   console.log(`\n                ----------                \n`);
   console.log(`Welcome to Jacob's Employee Managment System\n`);
   console.log(`         Copyright 2023 Jacob Jeffries      `);
   console.log(`\n                ----------                \n`);
+}
 
+async function main(){
   const { mMenu } = await mainMenu();
 
   if(mMenu ===  "View All Employees"){
     viewEmployees();
+  }else if(mMenu === 'View All Roles'){
+    viewRoles();
   }else if(mMenu === 'Quit'){
     quit();
   }
 };
+
+async function quit() {
+  const db = await connect();
+  db.end();
+  clear();
+  process.exit(0);
+}
+
+display();
 main();

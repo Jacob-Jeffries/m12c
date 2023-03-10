@@ -50,7 +50,7 @@ async function viewEmployees() {
 
 async function getNames(){
   const db = await connect();
-  const sql = `SELECT CONCAT(first_name,' ',last_name) AS name FROM employee`;
+  const sql = `SELECT CONCAT(id,' ',first_name,' ',last_name) AS name FROM employee`;
   const [rows] = await db.execute(sql);
   let names = ['No Manager'];
   Object.values(rows).forEach((name) => {names.push(name.name)});
@@ -64,6 +64,26 @@ async function getRoles(){
   let roles = [];
   Object.values(rows).forEach((role) => {roles.push(role.title)});
   return roles;
+};
+
+async function addDepartment(){
+ const db = await connect();
+
+ const query = [
+  {
+    name: 'dept',
+    type: 'text',
+    message: 'Please enter the name of the new Department'
+  }
+];
+
+const department = await inquirer.prompt(query);
+const {dept} = department;
+
+const sql = `INSERT INTO department (dept_name) VALUES (?)`;
+const [rows] = await db.execute(sql, [dept])
+
+viewDepartments();
 };
 
 async function addEmployee() {
@@ -131,7 +151,7 @@ function mainMenu(){
         "View All Roles",
         "NO - Add Role",
         "View All Departments",
-        "Add Department",
+        "Add New Department",
         "Clear Screen",
         "Quit"
       ]
@@ -160,6 +180,8 @@ async function main(){
     viewRoles();
   }else if(mMenu === 'View All Departments'){
     viewDepartments();
+  }else if(mMenu === 'Add New Department'){
+    addDepartment();
   }else if(mMenu === 'Clear Screen'){
     display();
     main();

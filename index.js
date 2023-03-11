@@ -40,7 +40,8 @@ async function viewRoles() {
 
 async function viewEmployees() {
   const db = await connect();
-  const sql = `SELECT * FROM employee`;
+  const sql = `SELECT employee.id AS Emp_ID, CONCAT(employee.first_name,' ', employee.last_name) AS Employee_Name, roles.title AS Title, department.dept_name AS Department_Name, roles.salary AS Salary, CONCAT(man.first_name, ' ', man.last_name) AS Manager FROM employee LEFT JOIN roles ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee man ON employee.manager = man.id`;
+  // Now that is a hell of a join!
   const [rows] = await db.execute(sql);
   console.log('\n');
   console.table(rows); 
@@ -59,7 +60,7 @@ async function getNames(){
 
 async function getRoles(){
   const db = await connect();
-  const sql = `SELECT title FROM roles`;
+  const sql = `SELECT CONCAT(id,' ', title) AS title FROM roles`;
   const [rows] = await db.execute(sql);
   let roles = [];
   Object.values(rows).forEach((row) => {roles.push(row.title)});
@@ -167,6 +168,41 @@ async function addEmployee() {
   viewEmployees();
 };
 
+async function updateEmployee() {
+  const db = await connect();
+  const names_tmp = await getNames();
+  const names = names_tmp.slice(1);
+  const roles = await getRoles();
+  display();
+  console.log('\n');
+  console.log('Update and Employee\'s Role');
+  console.log('\n');
+  const query = [
+    {
+      name: 'emp',
+      type: 'list',
+      message: 'Please select the Employee to update:',
+      choices: names,
+      loop: false
+    },
+    {
+      name: 'role',
+      type: 'list',
+      message: 'Please select the new Role for this Employee:',
+      choices: roles,
+      loop: false
+    }
+  ];
+  const uEmp = await inquirer.prompt(query);
+  const { emp, role } = uEmp;
+  const emp_id = parseInt(emp);
+  const role_id = parseInt(role);
+  const sql = 'UPDATE employee SET roles_id = ? WHERE id = ?';
+  const [rows] = await db.execute(sql, [role_id, emp_id])
+  viewEmployeeByid();
+  main();
+};
+
 function mainMenu(){
   console.log('\n');
   const query = [
@@ -177,7 +213,7 @@ function mainMenu(){
       choices: [
         "View All Employees",
         "Add Employee",
-        "NO - Update Employee Role",
+        "Update Employee Role",
         "View All Roles",
         "Add New Role",
         "View All Departments",
@@ -205,6 +241,8 @@ async function main(){
     viewEmployees();
   }else if(mMenu === 'Add Employee'){
     addEmployee();
+  }else if(mMenu === 'Update Employee Role'){
+    updateEmployee();
   }else if(mMenu === 'View All Roles'){
     viewRoles();
   }else if(mMenu === 'Add New Role'){

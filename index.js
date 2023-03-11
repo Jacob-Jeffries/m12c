@@ -49,6 +49,17 @@ async function viewEmployees() {
   main();
 };
 
+async function viewEmployeeByid(emp_id){
+  const db = await connect();
+  const sql = `SELECT employee.id AS Emp_ID, CONCAT(employee.first_name,' ', employee.last_name) AS Employee_Name, roles.title AS Title, department.dept_name AS Department_Name, roles.salary AS Salary, CONCAT(man.first_name, ' ', man.last_name) AS Manager FROM employee LEFT JOIN roles ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee man ON employee.manager = man.id WHERE employee.id = ?`;
+  const [rows] = await db.execute(sql, [emp_id]);
+  console.log('\n');
+  console.table(rows); 
+  console.log('\n');
+  console.log('Employee successfully Updated.');
+  main();
+};
+
 async function getNames(){
   const db = await connect();
   const sql = `SELECT CONCAT(id,' ',first_name,' ',last_name) AS name FROM employee`;
@@ -136,7 +147,7 @@ async function addEmployee() {
     { 
       name: 'fn',
       type: 'text',
-      message: 'Please enter the new employee\'s Frist Name: '
+      message: 'Please enter the new employee\'s First Name: '
     },
     {
       name: 'ln',
@@ -199,7 +210,7 @@ async function updateEmployee() {
   const role_id = parseInt(role);
   const sql = 'UPDATE employee SET roles_id = ? WHERE id = ?';
   const [rows] = await db.execute(sql, [role_id, emp_id])
-  viewEmployeeByid();
+  viewEmployeeByid(emp_id);
   main();
 };
 
@@ -230,7 +241,7 @@ function mainMenu(){
 function display(){
   clear();
   console.log(`\n                ----------                \n`);
-  console.log(`Welcome to Jacob's Employee Managment System\n`);
+  console.log(`Welcome to Jacob's Employee Management System\n`);
   console.log(`         Copyright 2023 Jacob Jeffries      `);
   console.log(`\n                ----------                \n`);
 }

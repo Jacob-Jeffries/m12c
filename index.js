@@ -172,8 +172,11 @@ async function addEmployee() {
   const nEmp = await inquirer.prompt(query);
   const role_id = roles.indexOf(nEmp.rid) + 1;
   const { fn, ln, man } = nEmp;
-  let manager = names.indexOf(nEmp.man);
-  if(man === 'No Manager'){manager = null};
+  if(man === 'No Manager'){
+    manager = null
+  }else{
+    manager = parseInt(man)
+  }
   const sql = 'INSERT INTO employee (first_name, last_name, roles_id, manager) VALUES(?,?,?,?)';
   const [rows] = await db.execute(sql, [fn, ln, role_id, manager]);
   viewEmployees();
